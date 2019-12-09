@@ -1,8 +1,13 @@
 package com.example.kontr.redditapp;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import com.example.kontr.redditapp.model.Feed;
@@ -20,13 +25,40 @@ import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-
     private static final String BASE_URL = "https://www.reddit.com/r/";
+
+    private Button btnRefreshFeed;
+    private EditText mFeedName;
+    private String currentFeed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        btnRefreshFeed = findViewById(R.id.btnRefreshFeed);
+        mFeedName = findViewById(R.id.etFeedName);
+
+
+        init();
+
+        btnRefreshFeed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String feedName = mFeedName.getText().toString();
+                if(!feedName.equals("")){
+                    currentFeed = feedName;
+                    init();
+                } else {
+                    init();
+                }
+            }
+        });
+
+
+    }
+
+    private void init() {
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
@@ -35,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
 
         FeedApi feedApi = retrofit.create(FeedApi.class);
 
-        Call<Feed> call = feedApi.getFeed();
+        Call<Feed> call = feedApi.getFeed(currentFeed);
 
         call.enqueue(new Callback<Feed>() {
             @Override
@@ -52,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
 
                 Log.d("Title",entries.get(0).getTitle());
 
-                ArrayList<Post> posts = new ArrayList<>();
+                final ArrayList<Post> posts = new ArrayList<>();
 
                 for(int i = 0; i < entries.size(); i++) {
 
@@ -76,13 +108,28 @@ public class MainActivity extends AppCompatActivity {
 
                     }
 
+
                     int lastPosition = postContent.size() - 1;
-                    posts.add(new Post(entries.get(i).getTitle(),
-                            entries.get(i).getAuthor().getName(),
-                            entries.get(i).getUpdated(),
-                            postContent.get(0),
-                            postContent.get(lastPosition)
-                    ));
+                    try{
+
+                        posts.add(new Post(entries.get(i).getTitle(),
+                                entries.get(i).getAuthor().getName(),
+                                entries.get(i).getUpdated(),
+                                postContent.get(0),
+                                postContent.get(lastPosition)
+                        ));
+
+                    }catch (NullPointerException e){
+                        e.printStackTrace();
+
+                        posts.add(new Post(entries.get(i).getTitle(),
+                                "None",
+                                entries.get(i).getUpdated(),
+                                postContent.get(0),
+                                postContent.get(lastPosition)
+                        ));
+                    }
+
 
                 }
 
@@ -98,6 +145,20 @@ public class MainActivity extends AppCompatActivity {
                 ListView listView = findViewById(R.id.listView);
                 CustomListAdapter customListAdapter = new CustomListAdapter(MainActivity.this,R.layout.card_layout_main,posts);
                 listView.setAdapter(customListAdapter);
+
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        Intent intent = new Intent(MainActivity.this,CommentsActivity.class);
+                        intent.putExtra("@string/post_url",posts.get(position).getPostURL());
+                        intent.putExtra("@string/post_thumbnail",posts.get(position).getThumbnailURL());
+                        intent.putExtra("@string/post_author",posts.get(position).getAuthor());
+                        intent.putExtra("@string/post_title",posts.get(position).getTitle());
+                        intent.putExtra("@string/post_updated",posts.get(position).getDateUpdated());
+                        startActivity(intent);
+
+                    }
+                });
             }
 
             @Override
