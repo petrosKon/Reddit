@@ -3,6 +3,7 @@ package com.example.kontr.redditapp;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ListView;
 
 import com.example.kontr.redditapp.model.Feed;
 import com.example.kontr.redditapp.model.entry.Entry;
@@ -55,10 +56,10 @@ public class MainActivity extends AppCompatActivity {
 
                 for(int i = 0; i < entries.size(); i++) {
 
-                    ExtractXML extractXML1 = new ExtractXML("<a href=", entries.get(0).getContent());
+                    ExtractXML extractXML1 = new ExtractXML("<a href=", entries.get(i).getContent());
                     List<String> postContent = extractXML1.start();
 
-                    ExtractXML extractXML2 = new ExtractXML("<img src=", entries.get(0).getContent());
+                    ExtractXML extractXML2 = new ExtractXML("<img src=", entries.get(i).getContent());
 
                     try{
                         postContent.add(extractXML2.start().get(0));
@@ -85,11 +86,18 @@ public class MainActivity extends AppCompatActivity {
 
                 }
 
-                for(int j = 0; j < posts.size(); j++){
+                /*for(int j = 0; j < posts.size(); j++){
 
-                    Log.d(TAG,"PostURL: " + posts.get(j).getPostURL() + "ThumbnailURL" + posts.get(j).getThumbnailURL());
-                }
+                    Log.d(TAG,"PostURL: " + posts.get(j).getPostURL()
+                            + "\n" + "ThumbnailURL: " + posts.get(j).getThumbnailURL()
+                            + "\n" + "Title: " + posts.get(j).getTitle()
+                            + "\n" + "Author: " + posts.get(j).getAuthor()
+                            + "\n" + "Date updated: " + posts.get(j).getDateUpdated());
+                }*/
 
+                ListView listView = findViewById(R.id.listView);
+                CustomListAdapter customListAdapter = new CustomListAdapter(MainActivity.this,R.layout.card_layout_main,posts);
+                listView.setAdapter(customListAdapter);
             }
 
             @Override

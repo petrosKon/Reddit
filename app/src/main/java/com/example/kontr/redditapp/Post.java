@@ -4,14 +4,14 @@ public class Post {
 
     private String title;
     private String author;
-    private String date_updated;
+    private String dateUpdated;
     private String postURL;
     private String thumbnailURL;
 
-    public Post(String title, String author, String date_updated, String postURL, String thumbnailURL) {
+    public Post(String title, String author, String dateUpdated, String postURL, String thumbnailURL) {
         this.title = title;
         this.author = author;
-        this.date_updated = date_updated;
+        this.dateUpdated = dateUpdated;
         this.postURL = postURL;
         this.thumbnailURL = thumbnailURL;
     }
@@ -32,12 +32,12 @@ public class Post {
         this.author = author;
     }
 
-    public String getDate_updated() {
-        return date_updated;
+    public String getDateUpdated() {
+        return dateUpdated;
     }
 
-    public void setDate_updated(String date_updated) {
-        this.date_updated = date_updated;
+    public void setDateUpdated(String dateUpdated) {
+        this.dateUpdated = dateUpdated;
     }
 
     public String getPostURL() {
