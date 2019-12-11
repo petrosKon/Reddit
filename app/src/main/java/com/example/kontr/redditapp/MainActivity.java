@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import com.example.kontr.redditapp.Comments.CommentsActivity;
 import com.example.kontr.redditapp.model.Feed;
 import com.example.kontr.redditapp.model.entry.Entry;
 
@@ -22,10 +23,11 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
 
+import static com.example.kontr.redditapp.URLS.BASE_URL;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-    private static final String BASE_URL = "https://www.reddit.com/r/";
 
     private Button btnRefreshFeed;
     private EditText mFeedName;

@@ -8,8 +8,6 @@ import retrofit2.http.Path;
 
 public interface FeedApi {
 
-    String BASE_URL = "https://www.reddit.com/r/";
-
     @GET("{feed_name}/.rss")
     Call<Feed> getFeed(@Path("feed_name") String feed_name);
 
