@@ -5,4 +5,9 @@
     <string name="post_title">post_title</string>
     <string name="post_author">post_author</string>
     <string name="post_updated">post_updated</string>
+    <string name="post_id">post_id</string>
+    <string name="SessionModhash">com.example.kontr.redditapp.Account.SessionModhash</string>
+    <string name="SessionUsername">om.example.kontr.redditapp.Account.SessionUsername</string>
+    <string name="SessionCookie">om.example.kontr.redditapp.Account.SessionCookie</string>
+
 </resources>
