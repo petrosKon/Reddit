@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.example.kontr.redditapp.ExtractXML;
 import com.example.kontr.redditapp.FeedApi;
 import com.example.kontr.redditapp.R;
+import com.example.kontr.redditapp.WebViewActivity;
 import com.example.kontr.redditapp.model.Feed;
 import com.example.kontr.redditapp.model.entry.Entry;
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
@@ -99,15 +100,16 @@ public class CommentsActivity extends AppCompatActivity {
 
                 for(int i = 0; i < entrys.size() ; i++){
 
-                    ExtractXML extractXML = new ExtractXML(entrys.get(i).getContent(), "<div class=\"md\"><p>","</p>");
+                    ExtractXML extractXML = new ExtractXML("<div class=\"md\"><p>", entrys.get(i).getContent(), "</p>");
+                    Log.d(TAG,"content: " + entrys.get(i).getContent() + "\n-------------------------------------------------------------------");
                     List<String> commentDetails = extractXML.start();
                   //  Log.d(TAG,commentDetails.get(0));
-                    Log.d(TAG,entrys.get(i).toString() + "\n---------------------------------------------------------------------------");
+                    Log.d(TAG,entrys.get(i).toString() + "\n-------------------------------------------------------------------");
 
                     try {
 
                         mComments.add(new Comment(
-                                commentDetails.get(i),
+                                commentDetails.get(0),
                                 entrys.get(i).getAuthor().getName(),
                                 entrys.get(i).getUpdated(),
                                 entrys.get(i).getId()
@@ -127,7 +129,7 @@ public class CommentsActivity extends AppCompatActivity {
                     } catch (NullPointerException e){
 
                         mComments.add(new Comment(
-                                commentDetails.get(i),
+                                commentDetails.get(0),
                                 "None",
                                 entrys.get(i).getUpdated(),
                                 entrys.get(i).getId()
@@ -154,7 +156,7 @@ public class CommentsActivity extends AppCompatActivity {
 
     private void initPost() {
 
-        Intent incomingIntent = getIntent();
+        final Intent incomingIntent = getIntent();
         postURL = incomingIntent.getStringExtra("@string/post_url");
         postThumbnailURL = incomingIntent.getStringExtra("@string/post_thumbnail");
         postUpdated = incomingIntent.getStringExtra("@string/post_updated");
@@ -164,14 +166,14 @@ public class CommentsActivity extends AppCompatActivity {
         TextView author = findViewById(R.id.postAuthor);
         TextView title = findViewById(R.id.postTitle);
         TextView updated = findViewById(R.id.postUpdated);
-        ImageView thumbnailUrl = findViewById(R.id.postThumbnail);
+        ImageView thumbnail = findViewById(R.id.postThumbnail);
         Button btnReply = findViewById(R.id.btnPostReply);
         ProgressBar progressBar = findViewById(R.id.postLoadingProgressBar);
 
         title.setText(postTitle);
         author.setText(postAuthor);
         updated.setText(postUpdated);
-        displayImage(postThumbnailURL,thumbnailUrl,progressBar);
+        displayImage(postThumbnailURL,thumbnail,progressBar);
 
 
         //NSFW posts will cause an error
@@ -186,6 +188,15 @@ public class CommentsActivity extends AppCompatActivity {
             e.printStackTrace();
 
         }
+
+        thumbnail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(CommentsActivity.this,WebViewActivity.class);
+                intent.putExtra("url",postURL);
+                startActivity(intent);
+            }
+        });
 
     }
 
