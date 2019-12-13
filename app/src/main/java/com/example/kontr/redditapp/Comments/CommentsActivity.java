@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.kontr.redditapp.Account.LoginActivity;
 import com.example.kontr.redditapp.ExtractXML;
@@ -39,6 +40,7 @@ import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.nostra13.universalimageloader.utils.L;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.regex.PatternSyntaxException;
 
@@ -46,9 +48,12 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
 
 import static com.example.kontr.redditapp.URLS.BASE_URL;
+import static com.example.kontr.redditapp.URLS.COMMENT_URL;
+import static com.example.kontr.redditapp.URLS.LOGIN_URL;
 
 public class CommentsActivity extends AppCompatActivity {
 
@@ -83,6 +88,8 @@ public class CommentsActivity extends AppCompatActivity {
         progressText = findViewById(R.id.progressText);
         mProgressBar.setVisibility(View.VISIBLE);
         progressText.setVisibility(View.VISIBLE);
+
+        getSessionParams();
 
         setupToolbar();
 
@@ -160,7 +167,7 @@ public class CommentsActivity extends AppCompatActivity {
                     mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            getUserComment(postID);
+                            getUserComment(mComments.get(position).getId());
                         }
                     });
 
@@ -251,7 +258,8 @@ public class CommentsActivity extends AppCompatActivity {
 
     }
 
-    private void getUserComment(String post_id) {
+    private void getUserComment(final String post_id) {
+
         final Dialog dialog = new Dialog(CommentsActivity.this);
         dialog.setTitle("Dialog");
         dialog.setContentView(R.layout.comment_input_dialog);
@@ -263,13 +271,61 @@ public class CommentsActivity extends AppCompatActivity {
         dialog.show();
 
         Button btnPostComment = dialog.findViewById(R.id.btnPostComment);
-        final EditText editText = dialog.findViewById(R.id.dialogComment);
+        final EditText comment = dialog.findViewById(R.id.dialogComment);
 
         btnPostComment.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl(COMMENT_URL)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build();
+
+                FeedApi feedApi = retrofit.create(FeedApi.class);
+
+                HashMap<String,String> headerMap = new HashMap<>();
+                headerMap.put("User-Agent",username);
+                headerMap.put("X-Modhash",modhash);
+                headerMap.put("cookie","reddit_session=" + cookie);
+
+                String theComment = comment.getText().toString();
+                Call<CheckComment> call = feedApi.submitComment(headerMap,"comment",post_id,theComment);
+
+                call.enqueue(new Callback<CheckComment>() {
+                    @Override
+                    public void onResponse(Call<CheckComment> call, Response<CheckComment> response) {
+
+
+                        try {
+                            Log.d(TAG,response.toString());
+
+                            String success = response.body().getSuccess();
+
+                            if(success.equals("true")){
+
+                                Toast.makeText(CommentsActivity.this,"Post successful",Toast.LENGTH_SHORT).show();
+
+                            } else {
+
+                                Toast.makeText(CommentsActivity.this,"Error occurred",Toast.LENGTH_SHORT).show();
+
+                            }
+
+                        }catch (NullPointerException e){
+
+                        }
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<CheckComment> call, Throwable t) {
+
+                    }
+                });
 
             }
+
         });
 
     }
@@ -343,16 +399,33 @@ public class CommentsActivity extends AppCompatActivity {
         defaultImage = this.getResources().getIdentifier("@drawable/reddit_alien",null,this.getPackageName());
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.navigation_menu,menu);
-        return true;
-    }
-
+    /*
+     * Get the params stored in memory from logging in
+     */
     private void getSessionParams(){
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(CommentsActivity.this);
 
         username = sharedPreferences.getString("@string/SessionUsername","");
+        modhash = sharedPreferences.getString("@string/SessionModhash","");
+        cookie = sharedPreferences.getString("@string/SessionCookie","");
+
+        Log.d(TAG,"modhash='" + modhash + '\'' +
+                    ", cookie='" + cookie + '\'' +
+                    ", username='" + username + '\'' +
+                    '}');
+
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        getSessionParams();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.navigation_menu,menu);
+        return true;
     }
 }

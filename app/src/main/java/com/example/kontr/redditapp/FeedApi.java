@@ -1,6 +1,7 @@
 package com.example.kontr.redditapp;
 
 import com.example.kontr.redditapp.Account.CheckLogin;
+import com.example.kontr.redditapp.Comments.CheckComment;
 import com.example.kontr.redditapp.model.Feed;
 
 import java.util.Map;
@@ -25,5 +26,13 @@ public interface FeedApi {
             @Query("user") String user,
             @Query("passwd") String password,
             @Query("api_type") String type);
+
+
+    @POST("{comment}")
+    Call<CheckComment> submitComment(
+            @HeaderMap Map<String,String> headers,
+            @Path("comment") String comment,
+            @Query("parent") String parentID,
+            @Query("amp;text") String text);
 
 }

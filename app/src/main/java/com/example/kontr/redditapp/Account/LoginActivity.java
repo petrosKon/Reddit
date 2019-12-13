@@ -116,6 +116,10 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+    /*
+     * Save session params once login is successful!!
+     */
+
     private void setSessionParams(String username, String modhash, String cookie){
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -127,10 +131,10 @@ public class LoginActivity extends AppCompatActivity {
         editor.putString("@String/SessionCookie",cookie);
         editor.commit();
 
-        Log.d(TAG,"setSessionsParams: Storing session variables: \n" +
-                "username: " + username + "\n" +
-                "modhash: " + modhash + "\n"+
-                "cookie: " + cookie + "\n");
+        Log.d(TAG,"modhash='" + modhash + '\'' +
+                ", cookie='" + cookie + '\'' +
+                ", username='" + username + '\'' +
+                '}');
     }
 
 

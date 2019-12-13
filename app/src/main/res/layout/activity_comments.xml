@@ -5,7 +5,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        >
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -15,7 +16,8 @@
             <android.support.v7.widget.Toolbar
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/toolbar_main">
+                android:id="@+id/toolbar_main"
+                android:background="@drawable/blue_border">
 
             </android.support.v7.widget.Toolbar>
 
@@ -26,7 +28,8 @@
             android:layout_below="@+id/relLayoutToolbar"
             android:id="@+id/commentHeadingRelLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="@drawable/black_border">
 
             <ImageView
                 android:layout_width="70dp"
@@ -44,6 +47,7 @@
                 android:textAlignment="center"
                 android:text="reply"
                 android:textSize="8sp"
+                android:background="@drawable/lightblue_rounded_button"
                 android:layout_alignParentRight="true"
                 android:layout_alignBottom="@+id/postThumbnail"
                 android:layout_marginRight="10dp"/>
